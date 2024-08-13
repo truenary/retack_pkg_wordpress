@@ -1,8 +1,8 @@
 <?php
 /*
 Plugin Name: Retack Logging Plugin
-Description: Logs errors and sends them to an external API.
-Version: 1.1
+Description: Logs errors and sends them to an retack.ai.
+Version: 1.0
 Author: Truenary Solutions
 */
 
@@ -45,6 +45,11 @@ function send_error_to_api($title, $stack) {
     $api_url = 'https://api.dev.retack.ai/observe/error-log/';
     $api_key = get_option('elp_api_key');
 
+    $user_context = [
+        'user_id' => get_current_user_id(),
+        'username' => wp_get_current_user()->user_login
+    ];
+
     if (empty($api_key)) {
         error_log('API key is not set.');
         return;
@@ -53,6 +58,7 @@ function send_error_to_api($title, $stack) {
     $body = json_encode([
         'title' => $title,
         'stack_trace' => $stack,
+        'user_context' => $user_context,
         'site_url' => get_site_url(),
         'timestamp' => current_time('mysql')
     ]);
@@ -82,7 +88,7 @@ function log_shutdown_errors() {
     $error = error_get_last();
     if ($error !== NULL) {
         $error_message = "Shutdown Error: [{$error['type']}] {$error['message']} in {$error['file']} on line {$error['line']}";
-        send_error_to_api('Shutdown Error', $error_message); // Title for shutdown errors
+        send_error_to_api('Shutdown Error', $error_message);
         error_log($error_message);
     }
 }
@@ -90,7 +96,7 @@ add_action('shutdown', 'log_shutdown_errors');
 
 // Enqueue JavaScript for error logging
 function elp_enqueue_error_script() {
-    wp_enqueue_script('elp-error-handler', plugins_url('/js/error-handler.js', __FILE__), [], '1.0', true);
+    wp_enqueue_script('elp-error-handler', plugins_url('/js/error-handler.js', __FILE__), [], '1.0', false);
 }
 add_action('wp_enqueue_scripts', 'elp_enqueue_error_script');
 
@@ -99,20 +105,13 @@ function handle_js_error_logging() {
     // Decode the JSON body to get the data
     $data = json_decode(file_get_contents('php://input'), true);
 
-    if (isset($data['message']) && isset($data['error'])) {
-        $title = sanitize_text_field($data['message']);
-        $stack_trace = sanitize_textarea_field($data['message']);
+    if (isset($data['title']) && isset($data['stack_trace'])) {
 
         // Send the error to the API and capture the response
-        $response = send_error_to_api($title, $stack_trace);
+        $response = send_error_to_api($data['title'], $data['stack_trace']);
 
         if (is_wp_error($response)) {
             wp_send_json_error('Failed to send error to API: ' . $response->get_error_message());
-        } else {
-            $response_code = wp_remote_retrieve_response_code($response);
-            $response_body = wp_remote_retrieve_body($response);
-
-            wp_send_json_success(['response_code' => $response_code, 'response_body' => $response_body]);
         }
     } else {
         wp_send_json_error($data);
