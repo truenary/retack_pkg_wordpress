@@ -51,8 +51,9 @@ function send_error_to_api($title, $stack) {
     ];
 
     if (empty($api_key)) {
-        error_log('API key is not set.');
-        return;
+        $error_message = 'API key is not set.';
+        error_log($error_message);
+        return new WP_Error('api_key_missing', $error_message);
     }
 
     $body = json_encode([
@@ -72,7 +73,18 @@ function send_error_to_api($title, $stack) {
     ]);
 
     if (is_wp_error($response)) {
-        error_log('Failed to send error to retack.ai: ' . $response->get_error_message());
+        $error_message = 'Failed to send error to retack.ai: ' . $response->get_error_message();
+        error_log($error_message);
+        return new WP_ERROR('api_error', $error_message);
+    }
+
+    $response_code = wp_remote_retrieve_response_code($response);
+    if ($response_code == 200) {
+        return 'Error successfully sent to API.';
+    } else {
+        $error_message = 'Error sending to API. HTTP Status Code: ' . $response_code;
+        error_log($error_message);
+        return new WP_Error('api_error', $error_message);
     }
 }
 
@@ -111,7 +123,9 @@ function handle_js_error_logging() {
         $response = send_error_to_api($data['title'], $data['stack_trace']);
 
         if (is_wp_error($response)) {
-            wp_send_json_error('Failed to send error to API: ' . $response->get_error_message());
+            wp_send_json_error($response->get_error_message());
+        } else {
+            wp_send_json_success($response);
         }
     } else {
         wp_send_json_error($data);
