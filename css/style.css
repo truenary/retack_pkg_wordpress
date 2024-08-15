@@ -2,6 +2,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 
 
+body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, div
+{
+	margin: 0;
+	padding: 0;
+}
+
 .header {
     width: 100%;
     height: 66px;
@@ -123,6 +129,9 @@
 	list-style-position:inside;
 	padding:10px 26px 0px 26px ;
 	margin:0px;
+	display:flex;
+	flex-direction:column;
+	gap:6px;
 }
 
 #features ul {
@@ -130,7 +139,31 @@
 }
 
 .features-list{
+	display:flex;
+	flex-direction:column;
+	margin-top: 16px;
 	padding:0px 26px;
+	gap:10px;
+}
+
+.list-div{
+    display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.alert,.insight,.plan,.fix{
+	width:20px;
+	height:20px;
+}
+
+.alert img,
+.insight img,
+.plan img,
+.fix img{
+	width:100%;
+	height:100%;
+	object-fit:contain;
 }
 
 .socials{
