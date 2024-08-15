@@ -23,22 +23,16 @@ function elp_register_options_page() {
 add_action('admin_menu', 'elp_register_options_page');
 
 function elp_options_page() {
-?>
-    <div class="wrap">
-        <h2>Error Retack Settings</h2>
-        <form method="post" action="options.php">
-            <?php settings_fields('elp_options_group'); ?>
-            <table class="form-table">
-                <tr valign="top">
-                    <th scope="row"><label for="elp_api_key">Retack Environment Key</label></th>
-                    <td><input type="text" id="elp_api_key" name="elp_api_key" value="<?php echo esc_attr(get_option('elp_api_key')); ?>" style="width: 400px;" /></td>
-                </tr>
-            </table>
-            <?php submit_button(); ?>
-        </form>
-    </div>
-<?php
+    // Include the external HTML file
+    include plugin_dir_path(__FILE__) . 'views/settings_page_content.php';
 }
+
+// Enqueue styles
+function elp_enqueue_admin_assets() {
+    wp_enqueue_style('elp-styles', plugins_url('/css/style.css', __FILE__));
+    wp_enqueue_script('elp-error-handler', plugins_url('/js/error-handler.js', __FILE__));
+}
+add_action('admin_enqueue_scripts', 'elp_enqueue_admin_assets');
 
 // Send error log to the API
 function send_error_to_api($title, $stack) {
