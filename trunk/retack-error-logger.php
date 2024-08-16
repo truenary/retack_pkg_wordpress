@@ -1,14 +1,18 @@
 <?php
 /*
-Plugin Name: Retack Logging Plugin
-Description: Logs errors and sends them to an retack.ai.
+Plugin Name: Retack AI
+Description: Logs errors and sends them to retack.ai.
 Version: 1.0
 Author: Truenary Solutions
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 */
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
+
+$version = '1.0';
 
 // Register settings and settings page
 function elp_register_settings() {
@@ -22,17 +26,20 @@ function elp_register_options_page() {
 }
 add_action('admin_menu', 'elp_register_options_page');
 
+// Enqueue styles
+function elp_enqueue_assets() {
+	global $version;
+		
+    wp_enqueue_style('elp-styles', plugins_url('/css/style.css', __FILE__), array(), $version, false);
+}
+add_action('admin_enqueue_scripts', 'elp_enqueue_assets');
+
 function elp_options_page() {
     // Include the external HTML file
     include plugin_dir_path(__FILE__) . 'views/settings_page_content.php';
 }
 
-// Enqueue styles
-function elp_enqueue_admin_assets() {
-    wp_enqueue_style('elp-styles', plugins_url('/css/style.css', __FILE__));
-    wp_enqueue_script('elp-error-handler', plugins_url('/js/error-handler.js', __FILE__));
-}
-add_action('admin_enqueue_scripts', 'elp_enqueue_admin_assets');
+
 
 // Send error log to the API
 function send_error_to_api($title, $stack) {
@@ -50,7 +57,7 @@ function send_error_to_api($title, $stack) {
         return new WP_Error('api_key_missing', $error_message);
     }
 
-    $body = json_encode([
+    $body = wp_json_encode([
         'title' => $title,
         'stack_trace' => $stack,
         'user_context' => $user_context,
@@ -102,9 +109,20 @@ add_action('shutdown', 'log_shutdown_errors');
 
 // Enqueue JavaScript for error logging
 function elp_enqueue_error_script() {
-    wp_enqueue_script('elp-error-handler', plugins_url('/js/error-handler.js', __FILE__), [], '1.0', false);
+	global $version;
+	// Enqueue the error-handling script in all necessary contexts
+    if (is_admin() || $GLOBALS['pagenow'] === 'wp-login.php' || !is_admin()) {
+        wp_enqueue_script('elp-error-handler', plugins_url('/js/error-handler.js', __FILE__), array(), $version, false);
+    }
 }
+// Frontend Area
 add_action('wp_enqueue_scripts', 'elp_enqueue_error_script');
+
+// Admin area
+add_action('admin_enqueue_scripts', 'elp_enqueue_assets');
+
+// Login page
+add_action('login_enqueue_scripts', 'elp_enqueue_assets');
 
 // Handle AJAX errors
 function handle_js_error_logging() {
