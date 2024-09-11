@@ -7,7 +7,7 @@ window.addEventListener('error', function(event) {
         stack_trace: stackTrace // Stack trace
     };
 
-    fetch('/wp-admin/admin-ajax.php?action=log_js_error', {
+    fetch('/wp-admin/admin-ajax.php?action=rtk_log_js_error', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

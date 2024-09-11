@@ -17,13 +17,13 @@
             <div class='border'></div>
             <form method="post" action="options.php">
                 <?php
-                settings_fields('elp_options_group');
-                do_settings_sections('elp_options_group');
+                settings_fields('rtk_options_group');
+                do_settings_sections('rtk_options_group');
                 ?>
                 <div class="api-form">
-                    <label for="elp_api_key" class="api-form-label">Enter Environment Key</label>
+                    <label for="rtk_api_key" class="api-form-label">Enter Environment Key</label>
                     <div class="api-form-input">
-                        <input type="text" id="elp_api_key" name="elp_api_key" class="api-form-input-value" value="<?php echo esc_attr(get_option('elp_api_key')); ?>" />
+                        <input type="text" id="rtk_api_key" name="rtk_api_key" class="api-form-input-value" value="<?php echo esc_attr(get_option('rtk_api_key')); ?>" />
                         <button type="submit" class="button-primary">
                             Save
                         </button>
