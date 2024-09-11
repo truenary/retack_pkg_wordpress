@@ -73,7 +73,7 @@ Unordered list:
 
 == 3rd Party Service Disclosure ==
 
-This plugin relies on the Retack service to log and track errors. When errors occur, the plugin sends error details to the Retack API for analysis. 
+This plugin relies on the Retack service to log and track errors. When errors occur, the plugin sends error details to the Retack API for monitoring. 
 
 - **Service URL**: [Retack API](https://api.retack.ai/observe/error-log/)
 - **Terms of Use**: [Retack Terms of Service](https://retack.ai/terms&service)
