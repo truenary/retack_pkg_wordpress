@@ -57,6 +57,12 @@ function send_error_to_api($title, $stack) {
         return new WP_Error('api_key_missing', $error_message);
     }
 
+    // Escape output when needed
+    $escaped_api_key = esc_html($api_key); // For HTML output
+
+    // If using in JavaScript, escape accordingly
+    $escaped_api_key_js = esc_js($escaped_api_key); // Uncomment if needed for JS context
+
     $body = wp_json_encode([
         'title' => $title,
         'stack_trace' => $stack,
@@ -68,7 +74,7 @@ function send_error_to_api($title, $stack) {
     $response = wp_remote_post($api_url, [
         'headers' => [
             'Content-Type' => 'application/json',
-            'ENV-KEY' => $api_key
+            'ENV-KEY' => $escaped_api_key_js
         ],
         'body' => $body
     ]);
@@ -129,10 +135,33 @@ function handle_js_error_logging() {
     // Decode the JSON body to get the data
     $data = json_decode(file_get_contents('php://input'), true);
 
-    if (isset($data['title']) && isset($data['stack_trace'])) {
+    if (is_array($data)) {
+         // Sanitize the title
+        $title = isset($data['title']) ? sanitize_text_field($data['title']) : '';
+        // Sanitize the stack trace
+        $stack_trace = isset($data['stack_trace']) ? sanitize_textarea_field($data['stack_trace']) : '';
+
+        // Validate title and stack trace
+        if (empty($title)) { // Ensure title is not empty
+            // Handle the error appropriately
+            return;
+        }
+
+        if (empty($stack_trace)) { // Ensure stack trace is not empty
+            // Handle the error appropriately
+            return;
+        }
+
+        // Escape output when needed
+        $escaped_title = esc_html($title); // For HTML output
+        $escaped_stack_trace = esc_html($stack_trace); // For HTML output
+
+        // If using in JavaScript, escape accordingly
+        $escaped_title_js = esc_js($escaped_title); // Uncomment if needed for JS context
+        $escaped_stack_trace_js = esc_js($escaped_stack_trace); 
 
         // Send the error to the API and capture the response
-        $response = send_error_to_api($data['title'], $data['stack_trace']);
+        $response = send_error_to_api($escaped_title_js, $escaped_stack_trace_js);
 
         if (is_wp_error($response)) {
             wp_send_json_error($response->get_error_message());
