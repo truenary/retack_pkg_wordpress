@@ -43,7 +43,7 @@ function elp_options_page() {
 
 // Send error log to the API
 function send_error_to_api($title, $stack) {
-    $api_url = 'https://api.dev.retack.ai/observe/error-log/';
+    $api_url = 'https://api.retack.ai/observe/error-log/';
     $api_key = get_option('elp_api_key');
 
     $user_context = [
