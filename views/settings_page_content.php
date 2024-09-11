@@ -17,13 +17,13 @@
             <div class='border'></div>
             <form method="post" action="options.php">
                 <?php
-                settings_fields('rtk_options_group');
-                do_settings_sections('rtk_options_group');
+                settings_fields('retack_options_group');
+                do_settings_sections('retack_options_group');
                 ?>
                 <div class="api-form">
-                    <label for="rtk_api_key" class="api-form-label">Enter Environment Key</label>
+                    <label for="retack_api_key" class="api-form-label">Enter Environment Key</label>
                     <div class="api-form-input">
-                        <input type="text" id="rtk_api_key" name="rtk_api_key" class="api-form-input-value" value="<?php echo esc_attr(get_option('rtk_api_key')); ?>" />
+                        <input type="text" id="retack_api_key" name="retack_api_key" class="api-form-input-value" value="<?php echo esc_attr(get_option('retack_api_key')); ?>" />
                         <button type="submit" class="button-primary">
                             Save
                         </button>
