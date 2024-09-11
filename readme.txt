@@ -70,3 +70,13 @@ Unordered list:
 – Sends error details to Retack API.
 – Easy integration with WordPress settings.
 – Supports error logging for enhanced debugging.
+
+== 3rd Party Service Disclosure ==
+
+This plugin relies on the Retack service to log and track errors. When errors occur, the plugin sends error details to the Retack API for analysis. 
+
+- **Service URL**: [Retack API](https://api.retack.ai/observe/error-log/)
+- **Terms of Use**: [Retack Terms of Service](https://retack.ai/terms&service)
+- **Privacy Policy**: [Retack Privacy Policy](https://retack.ai/privacyPolicy)
+
+Please be aware that by using this plugin, error data will be transmitted to the Retack service for monitoring, tracking and processing.
